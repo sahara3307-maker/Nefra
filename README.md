@@ -201,3 +201,57 @@
   </script>
 </body>
 </html>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23000'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='32' fill='white'%3EN%3C/text%3E%3C/svg%3E">
+<meta property="og:title" content="Nefra — AI Perfume Muse">
+<meta property="og:description" content="Clickable prototype with four demo dialogues.">
+<meta property="og:type" content="website">
+<body class="bg-neutral-200">
+<body class="bg-gradient-to-b from-[#0b0b0c] to-[#161618]">
+<div className="rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden">
+<div className="mt-3 flex gap-2">
+  <input id="freeText" className="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm"
+         placeholder="Ask Nefra anything… e.g., ‘fresh for office’"/>
+  <button id="askBtn" className="px-3 py-2 rounded-xl bg-gray-900 text-white text-sm">Ask</button>
+</div>
+// tiny intent rules + demo data
+const perfumes = [
+  { mood: "romantic",   notes: ["rose","vanilla","musk"], longevity: "7–8h",  sillage: "intimate" },
+  { mood: "warm night", notes: ["saffron","rose","oud"],  longevity: "8–10h", sillage: "moderate" },
+  { mood: "fresh work", notes: ["citrus","neroli"],       longevity: "5–6h",  sillage: "light" },
+];
+
+const pickByIntent = (t) => {
+  t = t.toLowerCase();
+  if (t.includes("romantic")) return perfumes[0];
+  if ((t.includes("warm") && t.includes("night")) || t.includes("evening")) return perfumes[1];
+  if (t.includes("fresh") && (t.includes("work") || t.includes("office"))) return perfumes[2];
+  return null;
+};
+
+// expose a simple ask() so the DOM button can trigger it
+window.__askFree = async (text) => {
+  if (!text) return;
+  setMessages((m) => [...m, { id: uid(), role: "user", text }]);
+  await sleep(300);
+  const match = pickByIntent(text);
+  const reply = match
+    ? `Try something with ${match.notes.join(", ")} — lasts ${match.longevity} with ${match.sillage} sillage. Want a bolder variation?`
+    : "I can help by mood, occasion, or notes. Try: ‘romantic’, ‘warm night’, or ‘fresh for office’.";
+  await typewriterAppend(reply);
+};
+// simple DOM hookup for the Ask button
+setTimeout(() => {
+  const input = document.getElementById("freeText");
+  const btn = document.getElementById("askBtn");
+  if (!input || !btn) return;
+  btn.onclick = () => window.__askFree?.(input.value.trim());
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") btn.click(); });
+}, 0);
+// simple DOM hookup for the Ask button
+setTimeout(() => {
+  const input = document.getElementById("freeText");
+  const btn = document.getElementById("askBtn");
+  if (!input || !btn) return;
+  btn.onclick = () => window.__askFree?.(input.value.trim());
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") btn.click(); });
+}, 0);
